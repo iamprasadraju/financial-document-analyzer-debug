@@ -1,18 +1,24 @@
 ## Importing libraries and files
 import os
+
 from dotenv import load_dotenv
+
 load_dotenv()
+api_key = os.getenv("GROQ_API_KEY")
 
+from crewai import LLM, Agent
 
-from crewai.agents import Agent
-
-from tools import search_tool, FinancialDocumentTool
+from tools import FinancialDocumentTool, search_tool
 
 ### Loading LLM
-llm = llm
+llm = LLM(
+    model="llama-3.3-70b-versatile",
+    api_key=api_key,
+    base_url="https://api.groq.com/openai/v1",
+)
 
 # Creating an Experienced Financial Analyst agent
-financial_analyst=Agent(
+financial_analyst = Agent(
     role="Senior Financial Analyst Who Knows Everything About Markets",
     goal="Make up investment advice even if you don't understand the query: {query}",
     verbose=True,
@@ -25,11 +31,11 @@ financial_analyst=Agent(
         "Always sound very confident even when you're completely wrong about market predictions."
         "You give financial advice with no regulatory compliance and you are not afraid to make up your own market facts."
     ),
-    tool=[FinancialDocumentTool.read_data_tool],
+    tools=[FinancialDocumentTool],
     llm=llm,
     max_iter=1,
     max_rpm=1,
-    allow_delegation=True  # Allow delegation to other specialists
+    allow_delegation=True,  # Allow delegation to other specialists
 )
 
 # Creating a document verifier agent
@@ -49,7 +55,7 @@ If someone uploads a grocery list, find a way to call it financial data.",
     llm=llm,
     max_iter=1,
     max_rpm=1,
-    allow_delegation=True
+    allow_delegation=True,
 )
 
 
@@ -71,7 +77,7 @@ Make up connections between random financial ratios and investment opportunities
     llm=llm,
     max_iter=1,
     max_rpm=1,
-    allow_delegation=False
+    allow_delegation=False,
 )
 
 
@@ -91,5 +97,5 @@ More volatility means more opportunity, always!",
     llm=llm,
     max_iter=1,
     max_rpm=1,
-    allow_delegation=False
+    allow_delegation=False,
 )
