@@ -21,7 +21,7 @@ def run_crew(query: str, file_path: str = "data/sample.pdf"):
         process=Process.sequential,
     )
 
-    result = financial_crew.kickoff({"query": query, "file_path": file_path})
+    result = financial_crew.kickoff({"path": file_path, "query": query})
     return result
 
 
@@ -38,26 +38,32 @@ async def analyze_financial_document(
         default="Analyze this financial document for investment insights"
     ),
 ):
-    """Analyze financial document and provide comprehensive investment recommendations"""
+    """Analyze financial document and provide investment insights"""
 
     file_id = str(uuid.uuid4())
     file_path = f"data/financial_document_{file_id}.pdf"
 
     try:
-        # Ensure data directory exists
         os.makedirs("data", exist_ok=True)
 
-        # Save uploaded file
+        # Save uploaded PDF
         with open(file_path, "wb") as f:
-            content = await file.read()
-            f.write(content)
+            f.write(await file.read())
 
-        # Validate query
-        if query == "" or query is None:
-            query = "Analyze this financial document for investment insights"
+        # Run CrewAI
+        financial_crew = Crew(
+            agents=[financial_analyst],
+            tasks=[analyze_financial_document],  # your task object
+            process=Process.sequential,
+        )
 
-        # Process the financial document with all analysts
-        response = run_crew(query=query.strip(), file_path=file_path)
+        # Pass the correct key matching the tool argument
+        response = financial_crew.kickoff(
+            {
+                "path": file_path,  # <-- must match FinancialDocumentTool(path)
+                "query": query.strip(),
+            }
+        )
 
         return {
             "status": "success",
@@ -72,12 +78,8 @@ async def analyze_financial_document(
         )
 
     finally:
-        # Clean up uploaded file
         if os.path.exists(file_path):
-            try:
-                os.remove(file_path)
-            except:
-                pass  # Ignore cleanup errors
+            os.remove(file_path)
 
 
 if __name__ == "__main__":

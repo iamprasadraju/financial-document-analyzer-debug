@@ -1,22 +1,23 @@
 ## Importing libraries and files
+import asyncio
 import os
 
-from dotenv import load_dotenv
-from langchain_community.document_loaders import PyPDFLoader
-
-load_dotenv()
-
+# load_dotenv()
 from crewai.tools import tool
-from crewai_tools import tools
-from crewai_tools.tools import SerperDevTool
+from crewai_tools import SerperDevTool, tools
+
+# from dotenv import load_dotenv
+from langchain_community.document_loaders import PyPDFLoader
 
 ## Creating search tool
 search_tool = SerperDevTool()
 
 
 ## Creating custom pdf reader tool
-@tool
-def FinancialDocumentTool(path="data/TSLA-Q2-2025-Update.pdf"):
+@tool("Read Financial Document")
+def FinancialDocumentTool(
+    path: str,
+) -> str:
     """Tool to read data from a pdf file from a path
 
     Args:
@@ -39,30 +40,68 @@ def FinancialDocumentTool(path="data/TSLA-Q2-2025-Update.pdf"):
             content = content.replace("\n\n", "\n")
 
         full_report += content + "\n"
-
+    # print(full_report)
     return full_report
 
 
 ## Creating Investment Analysis Tool
-class InvestmentTool:
-    async def analyze_investment_tool(financial_document_data):
-        # Process and analyze the financial document data
-        processed_data = financial_document_data
+@tool("Investment Analysis Tool")
+def InvestmentTool(financial_document_data: str) -> str:
+    """
+    Analyzes financial document data and generates investment insights.
 
-        # Clean up the data format
-        i = 0
-        while i < len(processed_data):
-            if processed_data[i : i + 2] == "  ":  # Remove double spaces
-                processed_data = processed_data[:i] + processed_data[i + 1 :]
-            else:
-                i += 1
+    Args:
+        financial_document_data (str): Extracted financial document text.
 
-        # TODO: Implement investment analysis logic here
-        return "Investment analysis functionality to be implemented"
+    Returns:
+        str: Investment analysis summary.
+    """
+    # Process and analyze the financial document data
+    processed_data = financial_document_data
+
+    # Clean up the data format
+    i = 0
+    while i < len(processed_data):
+        if processed_data[i : i + 2] == "  ":  # Remove double spaces
+            processed_data = processed_data[:i] + processed_data[i + 1 :]
+        else:
+            i += 1
+
+    # TODO: Implement investment analysis logic here
+    return "Investment analysis functionality to be implemented"
 
 
-## Creating Risk Assessment Tool
-class RiskTool:
-    async def create_risk_assessment_tool(financial_document_data):
-        # TODO: Implement risk assessment logic here
-        return "Risk assessment functionality to be implemented"
+@tool("Risk Assessment Tool")
+def RiskTool(financial_document_data: str) -> str:
+    """
+    Analyzes financial document data and generates a structured risk assessment.
+
+    Args:
+        financial_document_data (str): Extracted financial document text.
+
+    Returns:
+        str: A summary of key financial risks identified in the document,
+             including operational, market, liquidity, and credit risks.
+    """
+
+    # Basic placeholder risk logic
+    if not financial_document_data:
+        return "No financial data provided. Unable to perform risk assessment."
+
+    risks = []
+
+    text = financial_document_data.lower()
+
+    if "debt" in text:
+        risks.append("Potential leverage risk due to outstanding debt levels.")
+
+    if "loss" in text:
+        risks.append("Profitability risk indicated by reported losses.")
+
+    if "decline" in text:
+        risks.append("Revenue contraction risk due to declining performance metrics.")
+
+    if not risks:
+        risks.append("No immediate red flags detected based on keyword scan.")
+
+    return "Risk Assessment Summary:\n- " + "\n- ".join(risks)

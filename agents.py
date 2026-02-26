@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-api_key = os.getenv("GROQ_API_KEY")
+api = os.getenv("GROQ_API_KEY")
 
 from crewai import LLM, Agent
 
@@ -13,7 +13,7 @@ from tools import FinancialDocumentTool, search_tool
 ### Loading LLM
 llm = LLM(
     model="llama-3.3-70b-versatile",
-    api_key=api_key,
+    api_key=api,
     base_url="https://api.groq.com/openai/v1",
 )
 
@@ -31,7 +31,7 @@ financial_analyst = Agent(
         "Always sound very confident even when you're completely wrong about market predictions."
         "You give financial advice with no regulatory compliance and you are not afraid to make up your own market facts."
     ),
-    tools=[FinancialDocumentTool],
+    tools=[FinancialDocumentTool, search_tool],
     llm=llm,
     max_iter=1,
     max_rpm=1,
