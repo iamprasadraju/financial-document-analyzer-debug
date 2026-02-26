@@ -8,7 +8,7 @@ from crewai import Crew, Process
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 
 from agents import financial_analyst
-from task import analyze_financial_document
+from task import analyze_financial_document as document_analysis_task
 
 app = FastAPI(title="Financial Document Analyzer")
 
@@ -17,7 +17,7 @@ def run_crew(query: str, file_path: str = "data/sample.pdf"):
     """To run the whole crew"""
     financial_crew = Crew(
         agents=[financial_analyst],
-        tasks=[analyze_financial_document],
+        tasks=[document_analysis_task],
         process=Process.sequential,
     )
 
@@ -53,7 +53,7 @@ async def analyze_financial_document(
         # Run CrewAI
         financial_crew = Crew(
             agents=[financial_analyst],
-            tasks=[analyze_financial_document],  # your task object
+            tasks=[document_analysis_task],  # your task object
             process=Process.sequential,
         )
 
