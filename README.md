@@ -89,13 +89,31 @@ max_iter=1, max_rpm=1
 max_iter=15, max_rpm=30  # For financial_analyst
 ```
 
+### Bug 3: Python Version Compatibility
+
+**Issue:** Dependency conflicts with Python 3.10 version requirements.
+
+**Location:** `requirements.txt`
+
+**Root Cause:** Some packages had version constraints incompatible with Python 3.10, causing installation failures.
+
+**Fix:** Updated `pyproject.toml` to specify `requires-python = ">=3.10"` and used compatible dependency versions. The project now uses `uv` for dependency management which handles version resolution better.
+
+---
+
 ### Git Commit History
 
 ```bash
-$ git log --oneline -3
+$ git log --oneline -10
 2d1b28b fix: resolve name collision and improve financial document analysis
 36013f6 tasks fix
 05ff92c Refactor PDF reader and analysis functions into @tool classes
+a2e82b2 some prompt improvements
+7a7a688 #2 config: LLM
+a53edc0 Imported essential dependencies
+e4a00c6 #3 added Pdf loader
+165eebc #1 fixes: conflicts in requirements to python 3.10
+4722a35 initial version of project
 ```
 
 ---
@@ -171,19 +189,47 @@ cd financial-document-analyzer-debug
 
 ### 2. Create Virtual Environment
 
+#### Using uv (Recommended)
+
+`uv` is a fast Python package installer and resolver. It reads dependencies from `pyproject.toml`:
+
 ```bash
-# Using uv (recommended)
+# Create virtual environment and install dependencies in one step
+uv venv && uv sync
+
+# Or separately
 uv venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+uv sync
+```
 
-# Or using virtualenv
+#### Using pip with requirements.txt
+
+```bash
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+#### Using pip with pyproject.toml
+
+```bash
+# Create virtual environment
 python -m venv .venv
 source .venv/bin/activate
+
+# Install using pip
+pip install -e .
 ```
 
 ### 3. Install Dependencies
 
 ```bash
+# If using uv (recommended) - dependencies are already installed via uv sync above
+# Otherwise with pip:
 pip install -r requirements.txt
 ```
 
