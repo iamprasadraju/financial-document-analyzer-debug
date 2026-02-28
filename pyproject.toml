@@ -1,0 +1,27 @@
+[project]
+name = "financial-document-analyzer"
+version = "0.1.0"
+description = "A comprehensive financial document analysis system that processes corporate reports, financial statements, and investment documents using AI-powered analysis agents built with CrewAI."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = []
+
+dependencies = [
+    "click",
+    "crewai>=0.175.0",
+    "crewai[tools]",
+    "fastapi",
+    "openai>=1.13.3",
+    "python-dotenv",
+    "uvicorn",
+    "python-multipart",
+    "langchain",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = []
